@@ -7,17 +7,27 @@ import java.util.UUID;
 
 @Component
 public class ApplicationIdentifierFilter implements Filter {
-    String uuid;
-
-    public ApplicationIdentifierFilter() {
-        super();
-        this.uuid = UUID.randomUUID().toString();
-    }
+    String uuid = UUID.randomUUID().toString();
 
     @Override
-    public void doFilter(ServletRequest servletRequest, ServletResponse servletResponse, FilterChain filterChain) throws IOException, ServletException {
-        if(servletResponse instanceof HttpServletResponse httpServletResponse) {
-            httpServletResponse.setHeader("Instance-Id", uuid);
+    public void doFilter(ServletRequest servletRequest,
+                         ServletResponse servletResponse,
+                         FilterChain filterChain) throws IOException, ServletException {
+
+        /** on appelle le filtre suivant en lui passant servletRequest
+            et il récupère ensuite le return du filtre suivant
+         *          x --------> F1 --------> F2 --------> Servlet
+         *            <-------     <--------    <--------
+         */
+
+        if (servletResponse instanceof HttpServletResponse httpResponse) {
+            httpResponse.setHeader("Instance-Id", uuid);
+            /* revient à : ((HttpServletResponse) servletResponse).addHeader...
+             mais sans cast */
         }
+
+        filterChain.doFilter(servletRequest, servletResponse);
+
+
     }
 }
