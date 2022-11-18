@@ -1,22 +1,30 @@
 package fr.lernejo.todo;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.ArrayList;
 import java.util.Collection;
-import java.util.List;
+
 
 @RestController
-@RequestMapping("api/todo") //binde à l'URL /api/todo
+@RequestMapping("api/todo")
 public class TodoListController {
-    private final List<Todo> todos = new ArrayList<>();
 
-    @PostMapping
-    void addTodo(@RequestBody Todo todo) {
-        todos.add(todo);
+    private TodoRepository todos;
+
+    public TodoListController(TodoRepository tr) {
+        todos = tr;
     }
-
+    @PostMapping
+    void addTodo(@RequestBody TodoEntity todo) {
+        todos.save(todo);
+    }
     @GetMapping
-    Collection<Todo> getTodoList() {
-        return todos;
+    Collection<TodoEntity> getTodoList() {
+        ArrayList<TodoEntity> tc = new ArrayList<TodoEntity>();
+        todos.findAll().forEach((todo) -> {
+            tc.add(todo);
+        });
+        return tc;
     }
 }
